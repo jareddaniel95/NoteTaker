@@ -9,6 +9,16 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
+app.post('/api/notes', (req, res) => {
+  let storedNotes = JSON.parse(fs.readFileSync('./db/db.json', 'utf-8'));
+  let note = req.body;
+  let id = storedNotes.length.toString();
+  note.id = id;
+  storedNotes.push(note);
+  fs.writeFileSync('./db/db.json', JSON.stringify(storedNotes));
+  res.json(storedNotes);
+});
+
 app.get('/', (req, res) => {
   console.log("Going to home page");
   res.sendFile(path.join(__dirname, '/public/index.html'));

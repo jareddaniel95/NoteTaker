@@ -9,6 +9,21 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
+app.delete('/api/notes/:id', (req, res) => {
+  let storedNotes = JSON.parse(fs.readFileSync('./db/db.json', 'utf-8'));
+  let noteID = req.params.id;
+  storedNotes = storedNotes.filter(note => {
+    return note.id != noteID;
+  });
+  let updatedID = 0;
+  storedNotes.forEach(note => {
+    note.id = updatedID.toString();
+    updatedID++;
+  });
+  fs.writeFileSync('./db/db.json', JSON.stringify(storedNotes));
+  res.json(storedNotes);
+});
+
 app.post('/api/notes', (req, res) => {
   let storedNotes = JSON.parse(fs.readFileSync('./db/db.json', 'utf-8'));
   let note = req.body;
@@ -20,12 +35,10 @@ app.post('/api/notes', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log("Going to home page");
   res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 app.get('/notes', (req, res) => {
-  console.log("Going to notes page");
   res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
